@@ -1,5 +1,3 @@
-// A comment
-
 (function (window) {
 	"use strict";
 
@@ -177,7 +175,7 @@
 				}
 			};
 
-		/* -- testing with the second argument as a 'property' (string) -- */
+		/* -- testing with the second argument as a 'property' (string) AND the third argument as a 'data' (object) -- */
 		testObject.addListener("set", "test1", testData, testFunc1);
 
 		testObject.set("test1", true);
@@ -190,7 +188,7 @@
 
 		testObject.set("test1", true);
 		strictEqual(eventCalls1, 1, "The 'testFunc1' listener is removed");
-		/* -- /testing with the second argument as a 'property' (string) -- */
+		/* -- /testing with the second argument as a 'property' (string) AND the third argument as a 'data' (object) -- */
 	});
 
 	module("jsListenerObject: Trigger (event) tests");
