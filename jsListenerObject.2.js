@@ -44,7 +44,7 @@
 			return handlers;
 		},
 		addHandler : function (type, property, data, handler) {
-            var eventObject = {};
+            var eventObject;
 
 			if (!this.events[type]) {
 				this.events[type] = [];
@@ -83,9 +83,9 @@
 			}
 		},
 		removeHandler : function (type, property, data, handler) {
-			var handlers = [],
+			var handlers,
 				newHandlers = [],
-				propertyHandlers = [],
+				propertyHandlers,
 				newPropertyHandlers = [],
 				i,
 				l;
