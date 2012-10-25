@@ -1,0 +1,11 @@
+############
+## Windows
+############
+
+# Windows image file caches
+Thumbs.db
+
+web.config
+jsTdd.js
+jsListenerObject.js
+jsListenerObject.1.htm
