@@ -21,6 +21,12 @@
 	/* -- EventObject -- */
 	EventObject = function (options) {
 		SetOptions.apply(this, [options]);
+
+		this.bubbleCanceled = false;
+
+		this.cancelBubble = function () {
+			this.bubbleCanceled = true;
+		};
 	};
 	/* -- /EventObject -- */
 
@@ -133,7 +139,8 @@
 				handlers = this.getHandlers(type, property),
 				handler,
 				i,
-				l = handlers.length;
+				l = handlers.length,
+				eventObject = {};
 
 			if (bubble) {
 				eventOptions.targetObject = context;
@@ -154,13 +161,17 @@
 					delete eventOptions.value;
 				}
 
-				handler.apply(context, [new EventObject(eventOptions)]);
+				eventObject = new EventObject(eventOptions);
+
+				handler.apply(context, [eventObject]);
 			}
+
+			return eventObject;
 		},
 		trigger : function (type, property, context, bubble) {
 			var execHandlers = this.execHandlers;
 
-			execHandlers.apply(this, [type, property, context, bubble]);
+			return execHandlers.apply(this, [type, property, context, bubble]);
 		}
 	};
 	/* -- /EventHandlers -- */
@@ -230,11 +241,17 @@
 
 		/* -- trigger -- */
 		this.trigger = function (type, property, context, bubble) {
-			var trigger = eventHandlers.trigger;
+			var trigger = eventHandlers.trigger,
+				bubbleCanceled = false,
+				eventObject;
 
-			trigger.apply(eventHandlers, [type, property, (context || that), bubble]);
+			eventObject = trigger.apply(eventHandlers, [type, property, (context || that), bubble]);
 
-			if (parent) {
+			if (eventObject && eventObject.bubbleCanceled) {
+				bubbleCanceled = true;
+			}
+
+			if (parent && !bubbleCanceled) {
 				parent.trigger(type, property, (context || that), true);
 			}
 		};

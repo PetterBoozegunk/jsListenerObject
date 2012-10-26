@@ -365,4 +365,31 @@
 		strictEqual(testObject2.get("parent"), testObject, "ListenerObject.get('parent') returns the parent object");
 	});
 
+	test("The event object should have a 'cancelBubble' method that prevents bubbling", function () {
+		var testObject = window.createListenerObject(),
+			testObject2,
+			obj = {
+				type : "ListenerObject",
+				test : "cancelBubbleTest"
+			},
+			trigger1 = false,
+			trigger2 = false;
+
+		testObject2 = testObject.set("obj", obj);
+
+		testObject.addListener("cancelBubble", function () {
+			trigger2 = true;
+		});
+
+		testObject2.addListener("cancelBubble", function (e) {
+			e.cancelBubble();
+			trigger1 = true;
+		});
+
+		testObject2.trigger("cancelBubble");
+
+		strictEqual(trigger1, true, "The first handler is executed");
+		strictEqual(trigger2, false, "The second handler is NOT executed");
+	});
+
 }(window));
