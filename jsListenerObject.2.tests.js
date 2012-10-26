@@ -13,7 +13,7 @@
 			testObject,
 			construct,
 			TestConstructor,
-			textConst,
+			testConst,
 			testOpt,
 			k,
 			options = {
@@ -30,10 +30,10 @@
 		construct = testObject.get("constructor");
 		ok(construct, "Has a 'constructor' property that represents the ListenerObject constructor");
 
-		TestConstructor = testObject.get("constructor");
-		textConst = new TestConstructor();
+		TestConstructor = testObject.constructor;
+		testConst = new TestConstructor();
 
-		strictEqual(construct, textConst.constructor, "The actual constructor is the same as the 'constructor' property");
+		strictEqual(construct, testConst.constructor, "The actual constructor is the same as the 'constructor' property");
 
 		testOpt = window.createListenerObject(options);
 
@@ -350,6 +350,19 @@
 		});
 
 		testObject3.trigger("moreBubbles");
+	});
+
+	test("When using ListenerObject.get('parent') (which is NOT a visible property) the objects parent is returned", function () {
+		var testObject = window.createListenerObject(),
+			testObject2,
+			obj = {
+				type : "ListenerObject",
+				test : "parentTest"
+			};
+
+		testObject2 = testObject.set("obj", obj);
+
+		strictEqual(testObject2.get("parent"), testObject, "ListenerObject.get('parent') returns the parent object");
 	});
 
 }(window));

@@ -11,18 +11,6 @@
 
 		this.length = 0;
 
-		/* -- get -- */
-		this.get = function (property) {
-			var ret = this[property];
-
-			if (property === "constructor") {
-				ret = ListenerCollection;
-			}
-
-			return ret;
-		};
-		/* -- /get -- */
-
 		/* -- addItem -- */
 		this.addItem = function (item) {
 			this[this.length] = item;

@@ -181,8 +181,8 @@
 		this.get = function (property) {
 			var ret = this[property];
 
-			if (property === "constructor") {
-				ret = ListenerObject;
+			if (property === "parent") {
+				ret = parent;
 			}
 
 			return ret;

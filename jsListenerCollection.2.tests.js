@@ -30,7 +30,7 @@
 		construct = testCollection.get("constructor");
 		ok(construct, "Has a 'constructor' property that represents the ListenerCollection constructor");
 
-		TestConstructor = testCollection.get("constructor");
+		TestConstructor = testCollection.constructor;
 		textConst = new TestConstructor();
 
 		strictEqual(construct, textConst.constructor, "The actual constructor is the same as the 'constructor' property");
@@ -44,6 +44,19 @@
 		}
 
 		strictEqual(testCollection.length, 0, "A new (empty) collection has a length property set to '0'");
+	});
+
+	test("When using ListenerCollection.get('parent') (which is NOT a visible property) the objects parent is returned", function () {
+		var testObject = window.createListenerCollection(),
+			testObject2,
+			obj = {
+				type : "ListenerCollection",
+				test : "parentTest"
+			};
+
+		testObject2 = testObject.set("obj", obj);
+
+		strictEqual(testObject2.get("parent"), testObject, "ListenerCollection.get('parent') returns the parent object");
 	});
 
 	module("jsListenerCollection: addItem/removeItem");
