@@ -13,7 +13,7 @@
 
 		/* -- addItem -- */
 		this.addItem = function (item) {
-			this[this.length] = item;
+			this.set(this.length, item);
 			this.length += 1;
 
 			this.trigger("itemAdded");
