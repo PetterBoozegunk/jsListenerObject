@@ -258,7 +258,7 @@
 
 		testObject.addListener("propertyAdded", function (e) {
 			strictEqual(e.property, "someProperty", "event.property is set to 'someProperty'");
-			strictEqual(e.value, "someValue", "event.property is set to 'someValue'");
+			strictEqual(e.value, "someValue", "event.value is set to 'someValue'");
 		});
 
 		testObject.addProperty = function (name, value) {
