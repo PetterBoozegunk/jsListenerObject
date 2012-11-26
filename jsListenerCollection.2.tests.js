@@ -11,9 +11,6 @@
 	test("There is a global 'createListenerCollection' function that returns a new ListenerCollection", function () {
 		var testFunc = window.createListenerCollection,
 			testCollection,
-			construct,
-			TestConstructor,
-			textConst,
 			testOpt,
 			k,
 			options = {
@@ -26,14 +23,6 @@
 
 		testCollection = window.createListenerCollection();
 		ok(testCollection && typeof testCollection === "object" && !(testCollection instanceof Array), "'createListenerCollection' returns an Object");
-
-		construct = testCollection.get("constructor");
-		ok(construct, "Has a 'constructor' property that represents the ListenerCollection constructor");
-
-		TestConstructor = testCollection.constructor;
-		textConst = new TestConstructor();
-
-		strictEqual(construct, textConst.constructor, "The actual constructor is the same as the 'constructor' property");
 
 		testOpt = window.createListenerCollection(options);
 

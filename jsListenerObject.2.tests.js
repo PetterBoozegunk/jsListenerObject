@@ -291,19 +291,32 @@
 	module("jsListenerObject: Inheritance tests");
 	test("Any Object (not Array) that gets set and/or added with the 'set' method gets converted to a ListenerObject", function () {
 		var testObject = window.createListenerObject(),
-			contrs = testObject.get("constructor"),
 			options = {
 				test1 : "Whohoooo",
 				test2 : true
 			},
 			testObject2,
-			testArray;
+			testArray,
+			testMethods = function (obj) {
+				var methods = ["get", "set", "addListener", "removeListener", "trigger"],
+					i,
+					l = methods.length,
+					trueCount = 0;
+
+				for (i = 0; i < l; i += 1) {
+					if (obj[methods[i]]) {
+						trueCount += 1;
+					}
+				}
+
+				return (trueCount === methods.length);
+			};
 
 		testObject2 = testObject.set("whatevva", options);
-		strictEqual(testObject2 instanceof contrs, true, "The new object is an instanceof ListenerObject");
-
 		testArray = testObject.set("arrayTest", []);
-		strictEqual(testArray instanceof contrs, false, "The added array is NOT an instanceof ListenerObject");
+
+		strictEqual(testMethods(testObject2), true, "A new Object gets all jsListenets methods");
+		strictEqual(testMethods(testArray), false, "A new Array does NOT get any jsListener methods");
 	});
 
 	module("jsListenerObject: Event bubbling tests");

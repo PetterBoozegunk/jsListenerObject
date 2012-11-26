@@ -2,38 +2,33 @@
 	"use strict";
 
 	var createListenerCollection,
-		ListenerObject = window.createListenerObject().get("constructor"),
-		ListenerCollection;
+		createListenerObject = window.createListenerObject;
 
-	/* -- ListenerCollection -- */
-	ListenerCollection = function (options) {
-		ListenerObject.apply(this, [options]);
+	/* -- createListenerObject -- */
+	createListenerCollection = function (options) {
+		var that = createListenerObject(options);
 
-		this.length = 0;
+		that.length = 0;
 
 		/* -- addItem -- */
-		this.addItem = function (item) {
-			this.set(this.length, item);
-			this.length += 1;
+		that.addItem = function (item) {
+			that.set(that.length, item);
+			that.length += 1;
 
-			this.trigger("itemAdded");
+			that.trigger("itemAdded");
 		};
 		/* -- /addItem -- */
 
 		/* -- removeItem -- */
-		this.removeItem = function () {
-			delete this[this.length - 1];
-			this.length -= 1;
+		that.removeItem = function () {
+			delete that[that.length - 1];
+			that.length -= 1;
 
-			this.trigger("itemRemoved");
+			that.trigger("itemRemoved");
 		};
 		/* -- /removeItem -- */
-	};
-	/* -- /ListenerCollection -- */
 
-	/* -- createListenerObject -- */
-	createListenerCollection = function (options) {
-		return new ListenerCollection(options);
+		return that;
 	};
 	/* -- /createListenerObject -- */
 

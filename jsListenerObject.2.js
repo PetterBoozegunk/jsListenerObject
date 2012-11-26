@@ -1,66 +1,69 @@
 (function (window) {
 	"use strict";
 
-	var SetOptions,
-		EventObject,
-		EventHandlers,
-		ListenerObject,
+	var setOptions,
+		createEventObject,
+		createEventHandlers,
 		createListenerObject;
 
-	/* -- SetOptions -- */
-	SetOptions = function (options) {
-		var k;
+	setOptions = function (options) {
+		var that = {},
+			k;
+
 		for (k in options) {
 			if (options.hasOwnProperty(k)) {
-				this[k] = options[k];
+				that[k] = options[k];
 			}
 		}
+
+		return that;
 	};
 	/* -- /SetOptions -- */
 
 	/* -- EventObject -- */
-	EventObject = function (options) {
-		SetOptions.apply(this, [options]);
+	createEventObject = function (options) {
+		var that = setOptions(options);
 
-		this.bubbleCanceled = false;
+		that.bubbleCanceled = false;
 
-		this.cancelBubble = function () {
-			this.bubbleCanceled = true;
+		that.cancelBubble = function () {
+			that.bubbleCanceled = true;
 		};
+
+		return that;
 	};
 	/* -- /EventObject -- */
 
 	/* -- EventHandlers -- */
-	EventHandlers = function () {
-		this.events = {};
-	};
+	createEventHandlers = function () {
+		var that = {};
 
-	EventHandlers.prototype = {
-		getHandlers : function (type, property) {
+		that.getHandlers = function (type, property) {
 			var handlers = [];
 
-			if (this.events[type]) {
-				handlers = this.events[type];
+			if (that.events[type]) {
+				handlers = that.events[type];
 			}
 
-			if (this.events[property] && this.events[property][type]) {
-				handlers = handlers.concat(this.events[property][type]);
+			if (that.events[property] && that.events[property][type]) {
+				handlers = handlers.concat(that.events[property][type]);
 			}
 
 			return handlers;
-		},
-		addHandler : function (type, property, data, handler) {
-            var eventObject;
+		};
 
-			if (!this.events[type]) {
-				this.events[type] = [];
+		that.addHandler = function (type, property, data, handler) {
+			var eventObject;
+
+			if (!that.events[type]) {
+				that.events[type] = [];
 			}
 
-            eventObject = {
+			eventObject = {
 				property : property,
-                data : data,
-                handler : handler
-            };
+				data : data,
+				handler : handler
+			};
 
 			if (!handler && !data && typeof property === "function") {
 				eventObject.handler = property;
@@ -75,20 +78,21 @@
 			}
 
 			if (typeof property === "string") {
-				if (!this.events[property]) {
-					this.events[property] = {};
+				if (!that.events[property]) {
+					that.events[property] = {};
 				}
 
-				if (!this.events[property][type]) {
-					this.events[property][type] = [];
+				if (!that.events[property][type]) {
+					that.events[property][type] = [];
 				}
 
-				this.events[property][type].push(eventObject);
+				that.events[property][type].push(eventObject);
 			} else {
-				this.events[type].push(eventObject);
+				that.events[type].push(eventObject);
 			}
-		},
-		removeHandler : function (type, property, data, handler) {
+		};
+
+		that.removeHandler = function (type, property, data, handler) {
 			var handlers,
 				newHandlers = [],
 				propertyHandlers,
@@ -102,8 +106,8 @@
 				handler = data;
 			}
 
-			if (typeof property === "string" && this.events[property] && this.events[property][type]) {
-				propertyHandlers = this.events[property][type];
+			if (typeof property === "string" && that.events[property] && that.events[property][type]) {
+				propertyHandlers = that.events[property][type];
 
 				l = propertyHandlers.length;
 
@@ -113,11 +117,11 @@
 					}
 				}
 
-				this.events[property][type] = newPropertyHandlers;
+				that.events[property][type] = newPropertyHandlers;
 			}
 
-			if (this.events[type]) {
-				handlers = this.events[type];
+			if (that.events[type]) {
+				handlers = that.events[type];
 
 				l = handlers.length;
 
@@ -127,16 +131,17 @@
 					}
 				}
 
-				this.events[type] = newHandlers;
+				that.events[type] = newHandlers;
 			}
-		},
-		execHandlers : function (type, property, context, bubble) {
+		};
+
+		that.execHandlers = function (type, property, context, bubble) {
 			var eventOptions = {
 					type : type,
 					property : property,
 					value : context[property]
 				},
-				handlers = this.getHandlers(type, property),
+				handlers = that.getHandlers(type, property),
 				handler,
 				i,
 				l = handlers.length,
@@ -147,9 +152,9 @@
 			}
 
 			for (i = 0; i < l; i += 1) {
-                if (typeof handlers[i].data === "object") {
-                    eventOptions.data = handlers[i].data;
-                }
+				if (typeof handlers[i].data === "object") {
+					eventOptions.data = handlers[i].data;
+				}
 
 				handler = handlers[i].handler;
 
@@ -161,36 +166,39 @@
 					delete eventOptions.value;
 				}
 
-				eventObject = new EventObject(eventOptions);
+				eventObject = createEventObject(eventOptions);
 
 				handler.apply(context, [eventObject]);
 			}
 
 			return eventObject;
-		},
-		trigger : function (type, property, context, bubble) {
-			var execHandlers = this.execHandlers;
+		};
 
-			return execHandlers.apply(this, [type, property, context, bubble]);
-		}
+		that.trigger = function (type, property, context, bubble) {
+			var execHandlers = that.execHandlers;
+
+			return execHandlers.apply(that, [type, property, context, bubble]);
+		};
+
+		that.events = {};
+
+		return that;
 	};
 	/* -- /EventHandlers -- */
 
-	/* -- ListenerObject -- */
-	ListenerObject = function (options) {
-		SetOptions.apply(this, [options]);
+	/* -- createListenerObject -- */
+	createListenerObject = function (options) {
+		var that = setOptions(options),
+			eventHandlers = createEventHandlers(),
+			parent = that.parent;
 
-		var that = this,
-			eventHandlers = new EventHandlers(),
-			parent = this.parent;
-
-		if (this.parent) {
-			delete this.parent;
+		if (that.parent) {
+			delete that.parent;
 		}
 
 		/* -- get -- */
-		this.get = function (property) {
-			var ret = this[property];
+		that.get = function (property) {
+			var ret = that[property];
 
 			if (property === "parent") {
 				ret = parent;
@@ -201,16 +209,15 @@
 		/* -- /get -- */
 
 		/* -- set -- */
-		this.set = function (property, value) {
-			var valueIsChanged = (this[property] !== value),
-				//oldValue = this[property],
+		that.set = function (property, value) {
+			var valueIsChanged = (that[property] !== value),
 				trigger = eventHandlers.trigger;
 
 			if (typeof value === "object" && !(value instanceof Array)) {
-				value.parent = this;
-				this[property] = new ListenerObject(value);
+				value.parent = that;
+				that[property] = window.createListenerObject(value);
 			} else {
-				this[property] = value;
+				that[property] = value;
 			}
 
 			trigger.apply(eventHandlers, ["set", property, that]);
@@ -219,12 +226,12 @@
 				trigger.apply(eventHandlers, ["change", property, that]);
 			}
 
-			return this[property];
+			return that[property];
 		};
 		/* -- /set -- */
 
 		/* -- addListener -- */
-		this.addListener = function (type, property, data, handler) {
+		that.addListener = function (type, property, data, handler) {
 			var addHandler = eventHandlers.addHandler;
 
 			addHandler.apply(eventHandlers, [type, property, data, handler]);
@@ -232,7 +239,7 @@
 		/* -- /addListener -- */
 
 		/* -- removeListener -- */
-		this.removeListener = function (type, property, data, handler) {
+		that.removeListener = function (type, property, data, handler) {
 			var removeHandler = eventHandlers.removeHandler;
 
 			removeHandler.apply(eventHandlers, [type, property, data, handler]);
@@ -240,7 +247,7 @@
 		/* -- /removeListener -- */
 
 		/* -- trigger -- */
-		this.trigger = function (type, property, context, bubble) {
+		that.trigger = function (type, property, context, bubble) {
 			var trigger = eventHandlers.trigger,
 				bubbleCanceled = false,
 				eventObject;
@@ -256,12 +263,8 @@
 			}
 		};
 		/* -- /trigger -- */
-	};
-	/* -- /ListenerObject -- */
 
-	/* -- createListenerObject -- */
-	createListenerObject = function (options) {
-		return new ListenerObject(options);
+		return that;
 	};
 	/* -- /createListenerObject -- */
 
