@@ -4,8 +4,11 @@
 	var qUnit = window.QUnit,
 		module = qUnit.module,
 		test = qUnit.test,
+		asyncTest = qUnit.asyncTest,
 		ok = qUnit.ok,
-		strictEqual = qUnit.strictEqual;
+		strictEqual = qUnit.strictEqual,
+		start = qUnit.start,
+		stop = qUnit.stop;
 
 	module("jsQueue: Basic tests");
 	test("There is a global function called 'createJsQueue'", function () {
@@ -80,6 +83,64 @@
 		});
 		queue.exec();
 		strictEqual(queueReady, true, "A 'ready' event is triggered by the this.ready method in the last queue method");
+	});
+
+	asyncTest("The queue can handle delays", function () {
+		var n = 0,
+			queueObject = {
+				one : function (n) {
+					start();
+
+					var that = this;
+
+					n += 1;
+
+					strictEqual(n, 1, "n === 1");
+
+					setTimeout(function () {
+						that.ready(n);
+					}, 1000);
+
+					stop();
+				},
+				two : function (n) {
+					start();
+
+					var that = this;
+
+					n += 1;
+
+					strictEqual(n, 2, "n === 2");
+
+					setTimeout(function () {
+						that.ready(n);
+					}, 1000);
+					
+					stop();
+				}, 
+				three : function (n) {
+					start();
+
+					var that = this;
+
+					n += 1;
+
+					strictEqual(n, 3, "n === 3");
+					
+					setTimeout(function () {
+						that.ready();
+					}, 1000);
+
+					stop();
+				}
+			},
+			queue = window.createJsQueue(queueObject);
+
+		queue.addListener("ready", function () {
+			start();
+		});
+
+		queue.exec(n);
 	});
 
 }(window));
