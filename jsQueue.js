@@ -20,12 +20,20 @@
 	createJsQueue = function (queueObject) {
 		var that = window.createListenerCollection(),
 			currentMethod = 0,
+			inProggress = false,
+			stack = [],
 			privateMethods = {
 				ready : function () {
 					currentMethod += 1;
 
 					if (!that[currentMethod]) {
 						that.trigger("ready");
+						inProggress = false;
+
+						if (stack.length) {
+							that.exec.apply(that, stack[0]);
+							stack.shift();
+						}
 					} else {
 						that[currentMethod].apply(privateMethods, arguments);
 					}
@@ -35,8 +43,13 @@
 		addQueueItems(that, queueObject);
 
 		that.exec = function () {
-			currentMethod = 0;
-			that[currentMethod].apply(privateMethods, arguments);
+			if (!inProggress) {
+				currentMethod = 0;
+				that[currentMethod].apply(privateMethods, arguments);
+				inProggress = true;
+			} else {
+				stack.push(arguments);
+			}
 		};
 
 		return that;

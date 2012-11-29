@@ -69,7 +69,8 @@
 					this.ready(one, two);
 				}
 			},
-			queue = window.createJsQueue(queueObject);
+			queue = window.createJsQueue(queueObject),
+			queue2 = window.createJsQueue(queueObject);
 
 		ok(typeof queue.exec === "function", "There is an 'exec' method");
 
@@ -78,10 +79,11 @@
 
 		queue.exec(one, two);
 
-		queue.addListener("ready", function () {
+		queue2.addListener("ready", function () {
 			queueReady = true;
+
 		});
-		queue.exec();
+		queue2.exec();
 		strictEqual(queueReady, true, "A 'ready' event is triggered by the this.ready method in the last queue method");
 	});
 
@@ -90,7 +92,6 @@
 			queueObject = {
 				one : function (n) {
 					start();
-
 					var that = this;
 
 					n += 1;
@@ -99,13 +100,11 @@
 
 					setTimeout(function () {
 						that.ready(n);
-					}, 1000);
-
+					}, 100);
 					stop();
 				},
 				two : function (n) {
 					start();
-
 					var that = this;
 
 					n += 1;
@@ -114,23 +113,20 @@
 
 					setTimeout(function () {
 						that.ready(n);
-					}, 1000);
-					
+					}, 100);
 					stop();
-				}, 
+				},
 				three : function (n) {
 					start();
-
 					var that = this;
 
 					n += 1;
 
 					strictEqual(n, 3, "n === 3");
-					
+
 					setTimeout(function () {
 						that.ready();
-					}, 1000);
-
+					}, 100);
 					stop();
 				}
 			},
@@ -141,6 +137,117 @@
 		});
 
 		queue.exec(n);
+	});
+
+	module("jsQueue: Stack tests");
+	asyncTest("If a queue is executed twice (or more) in a row the queus get stacked and will be executed after one another (queue 1 will be ready before queue2 starts)", function () {
+		var ready = 0,
+			q1Opts = {
+				name : "q1",
+				first : false,
+				second : false,
+				ready : false
+			},
+			q1 = window.createListenerObject(q1Opts),
+			q2Opts = {
+				name : "q2",
+				first : false,
+				second : false,
+				ready : false
+			},
+			q2 = window.createListenerObject(q2Opts),
+			q3Opts = {
+				name : "q3",
+				first : false,
+				second : false,
+				ready : false
+			},
+			q3 = window.createListenerObject(q3Opts),
+			queueObject = {
+				first : function (q) {
+					var that = this;
+
+					q.set("first", true);
+
+					setTimeout(function () {
+						that.ready(q);
+					}, 100);
+				},
+				second : function (q) {
+					var that = this;
+
+					q.set("second", true);
+
+					setTimeout(function () {
+						that.ready();
+					}, 100);
+				}
+			},
+			queue = window.createJsQueue(queueObject);
+
+		queue.addListener("ready", function () {
+
+			ready += 1;
+
+			if (ready === 1) {
+				q1.set("ready", true);
+			} else if (ready === 2) {
+				q2.set("ready", true);
+			} else if (ready === 3) {
+				q3.set("ready", true);
+			}
+		});
+
+		q1.addListener("set", "ready", function () {
+			start();
+			strictEqual(q1.first, true, "q1.first === true");
+			strictEqual(q1.second, true, "q1.second === true");
+			strictEqual(q1.ready, true, "q1.ready === true");
+
+			strictEqual(q2.first, false, "q2.first === false");
+			strictEqual(q2.second, false, "q2.second === false");
+			strictEqual(q2.ready, false, "q2.ready === false");
+
+			strictEqual(q3.first, false, "q3.first === false");
+			strictEqual(q3.second, false, "q3.second === false");
+			strictEqual(q3.ready, false, "q3.ready === false");
+			stop();
+		});
+
+		q2.addListener("set", "ready", function () {
+			start();
+			strictEqual(q1.first, true, "q1.first === true");
+			strictEqual(q1.second, true, "q1.second === true");
+			strictEqual(q1.ready, true, "q1.ready === true");
+
+			strictEqual(q2.first, true, "q2.first === true");
+			strictEqual(q2.second, true, "q2.second === true");
+			strictEqual(q2.ready, true, "q2.ready === true");
+
+			strictEqual(q3.first, false, "q3.first === false");
+			strictEqual(q3.second, false, "q3.second === false");
+			strictEqual(q3.ready, false, "q3.ready === false");
+			stop();
+		});
+
+		q3.addListener("set", "ready", function () {
+			start();
+			strictEqual(q1.first, true, "q1.first === true");
+			strictEqual(q1.second, true, "q1.second === true");
+			strictEqual(q1.ready, true, "q1.ready === true");
+
+			strictEqual(q2.first, true, "q2.first === true");
+			strictEqual(q2.second, true, "q2.second === true");
+			strictEqual(q2.ready, true, "q2.ready === true");
+
+			strictEqual(q3.first, true, "q3.first === true");
+			strictEqual(q3.second, true, "q3.second === true");
+			strictEqual(q3.ready, true, "q3.ready === true");
+		});
+
+		queue.exec(q1);
+		queue.exec(q2);
+		queue.exec(q3);
 	});
 
 }(window));
