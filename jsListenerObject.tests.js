@@ -11,9 +11,6 @@
 	test("There is a global 'createListenerObject' function that returns a new ListenerOject", function () {
 		var testFunc = window.createListenerObject,
 			testObject,
-			construct,
-			TestConstructor,
-			testConst,
 			testOpt,
 			k,
 			options = {
@@ -26,14 +23,6 @@
 
 		testObject = window.createListenerObject();
 		ok(testObject && typeof testObject === "object" && !(testObject instanceof Array), "'createListenerObject' returns an Object");
-
-		construct = testObject.get("constructor");
-		ok(construct, "Has a 'constructor' property that represents the ListenerObject constructor");
-
-		TestConstructor = testObject.constructor;
-		testConst = new TestConstructor();
-
-		strictEqual(construct, testConst.constructor, "The actual constructor is the same as the 'constructor' property");
 
 		testOpt = window.createListenerObject(options);
 
