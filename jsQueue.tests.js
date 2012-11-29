@@ -140,7 +140,7 @@
 	});
 
 	module("jsQueue: Stack tests");
-	asyncTest("If a queue is executed twice (or more) in a row the queus get stacked and will be executed after one another (queue 1 will be ready before queue2 starts)", function () {
+	asyncTest("If a queue is executed twice (or more) in a row the queues get stacked and will be executed after one another (queue 1 will be ready before queue2 starts)", function () {
 		var ready = 0,
 			q1Opts = {
 				name : "q1",

@@ -28,6 +28,7 @@
 
 					if (!that[currentMethod]) {
 						that.trigger("ready");
+
 						inProggress = false;
 
 						if (stack.length) {
