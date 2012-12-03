@@ -354,6 +354,32 @@
 		testObject3.trigger("moreBubbles");
 	});
 
+	test("The 'set' event bubbles", function () {
+		var testObject = window.createListenerObject(),
+			setBubbles = 0;
+
+		testObject.addListener("set", function () {
+			setBubbles += 1;
+		});
+
+		testObject.set("level2", {test : "set level 2"}).set("level3", {test: "set level 3"});
+
+		strictEqual(setBubbles, 2, "The 'set' event bubbles");
+	});
+
+	test("The 'change' event bubbles", function () {
+		var testObject = window.createListenerObject(),
+			setBubbles = 0;
+
+		testObject.addListener("change", function () {
+			setBubbles += 1;
+		});
+
+		testObject.set("level2", {test : "set level 2"}).set("level3", {test: "set level 3"});
+
+		strictEqual(setBubbles, 2, "The 'change' event bubbles");
+	});
+
 	test("When using ListenerObject.get('parent') (which is NOT a visible property) the objects parent is returned", function () {
 		var testObject = window.createListenerObject(),
 			testObject2,
