@@ -179,6 +179,22 @@
 		strictEqual(eventCalls1, 1, "The 'testFunc1' listener is removed");
 		/* -- /testing with the second argument as a 'property' (string) AND the third argument as a 'data' (object) -- */
 	});
+	
+	test("It's possible to bind one eventHandler to multiple events", function () {
+        var testObject = window.createListenerObject(),
+            eventCount = 0,
+            testFunc = function () {
+                eventCount += 1;
+            };
+            
+        testObject.addListener("testOne testTwo testThree", testFunc);
+        
+        testObject.trigger("testOne");
+        testObject.trigger("testTwo");
+        testObject.trigger("testThree");
+        
+        strictEqual(eventCount, 3, "The testFunc is triggered by all three events ");
+    });
 
 	module("jsListenerObject: Trigger (event) tests");
 	test("It's possible to trigger an event (custom, 'set' and 'change') without setting or changing an property", function () {
