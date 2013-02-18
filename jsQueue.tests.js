@@ -40,8 +40,6 @@
 	test("The object created by 'createJsQueue' has an 'exec' method that executes the queue", function () {
 		var testCount = 0,
 			queueReady = false,
-			one = 0,
-			two = 0,
 			queueObject = {
 				first : function (one, two) {
 					testCount += 1;
@@ -77,7 +75,7 @@
 		queue.exec();
 		strictEqual(testCount, 2, "Both the first and second methods in the queueObject is executed");
 
-		queue.exec(one, two);
+		queue.exec(0, 0);
 
 		queue2.addListener("ready", function () {
 			queueReady = true;
@@ -88,8 +86,7 @@
 	});
 
 	asyncTest("The queue can handle delays", function () {
-		var n = 0,
-			queueObject = {
+		var queueObject = {
 				one : function (n) {
 					start();
 					var that = this;
@@ -136,7 +133,7 @@
 			start();
 		});
 
-		queue.exec(n);
+		queue.exec(0);
 	});
 
 	module("jsQueue: Stack tests");
